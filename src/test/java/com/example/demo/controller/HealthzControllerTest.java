@@ -32,7 +32,6 @@ class HealthzControllerTest {
     @Test
     void ready_WhenBothDatabasesHealthy_ReturnsOk() {
         when(healthRepository.checkPrimaryDatabase()).thenReturn(true);
-        when(healthRepository.checkSecondaryDatabase()).thenReturn(true);
 
         ResponseEntity<String> response = healthzController.ready();
 
@@ -43,33 +42,10 @@ class HealthzControllerTest {
     @Test
     void ready_WhenPrimaryDatabaseUnhealthy_ReturnsServiceUnavailable() {
         when(healthRepository.checkPrimaryDatabase()).thenReturn(false);
-        when(healthRepository.checkSecondaryDatabase()).thenReturn(true);
 
         ResponseEntity<String> response = healthzController.ready();
 
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-        assertEquals("Database check failed - Primary: DOWN, Secondary: UP", response.getBody());
-    }
-
-    @Test
-    void ready_WhenSecondaryDatabaseUnhealthy_ReturnsServiceUnavailable() {
-        when(healthRepository.checkPrimaryDatabase()).thenReturn(true);
-        when(healthRepository.checkSecondaryDatabase()).thenReturn(false);
-
-        ResponseEntity<String> response = healthzController.ready();
-
-        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-        assertEquals("Database check failed - Primary: UP, Secondary: DOWN", response.getBody());
-    }
-
-    @Test
-    void ready_WhenBothDatabasesUnhealthy_ReturnsServiceUnavailable() {
-        when(healthRepository.checkPrimaryDatabase()).thenReturn(false);
-        when(healthRepository.checkSecondaryDatabase()).thenReturn(false);
-
-        ResponseEntity<String> response = healthzController.ready();
-
-        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-        assertEquals("Database check failed - Primary: DOWN, Secondary: DOWN", response.getBody());
+        assertEquals("Database check failed - Primary: DOWN", response.getBody());
     }
 }

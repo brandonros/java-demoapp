@@ -8,27 +8,15 @@ import org.springframework.stereotype.Repository;
 public class HealthRepository {
 
     private final JdbcTemplate primaryJdbcTemplate;
-    private final JdbcTemplate secondaryJdbcTemplate;
 
     public HealthRepository(
-            @Qualifier("primaryJdbcTemplate") JdbcTemplate primaryJdbcTemplate,
-            @Qualifier("secondaryJdbcTemplate") JdbcTemplate secondaryJdbcTemplate) {
+            @Qualifier("primaryJdbcTemplate") JdbcTemplate primaryJdbcTemplate) {
         this.primaryJdbcTemplate = primaryJdbcTemplate;
-        this.secondaryJdbcTemplate = secondaryJdbcTemplate;
     }
 
     public boolean checkPrimaryDatabase() {
         try {
             primaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean checkSecondaryDatabase() {
-        try {
-            secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
             return true;
         } catch (Exception e) {
             return false;

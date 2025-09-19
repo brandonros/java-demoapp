@@ -37,25 +37,4 @@ public class DatabaseConfig {
     public JdbcTemplate primaryJdbcTemplate(@Qualifier("primaryDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
-
-    // Secondary database configuration
-    @Bean
-    @ConfigurationProperties("spring.datasource.secondary")
-    public DataSourceProperties secondaryDataSourceProperties() {
-        return new DataSourceProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties("spring.datasource.secondary.hikari")
-    public DataSource secondaryDataSource() {
-        return secondaryDataSourceProperties()
-            .initializeDataSourceBuilder()
-            .type(HikariDataSource.class)
-            .build();
-    }
-
-    @Bean
-    public JdbcTemplate secondaryJdbcTemplate(@Qualifier("secondaryDataSource") DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
 }

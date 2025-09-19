@@ -17,14 +17,11 @@ class HealthRepositoryTest {
     @Mock
     private JdbcTemplate primaryJdbcTemplate;
 
-    @Mock
-    private JdbcTemplate secondaryJdbcTemplate;
-
     private HealthRepository healthRepository;
 
     @BeforeEach
     void setUp() {
-        healthRepository = new HealthRepository(primaryJdbcTemplate, secondaryJdbcTemplate);
+        healthRepository = new HealthRepository(primaryJdbcTemplate);
     }
 
     @Test
@@ -43,26 +40,6 @@ class HealthRepositoryTest {
                 .thenThrow(new DataAccessException("Connection failed") {});
 
         boolean result = healthRepository.checkPrimaryDatabase();
-
-        assertFalse(result);
-    }
-
-    @Test
-    void checkSecondaryDatabase_WhenDatabaseIsHealthy_ReturnsTrue() {
-        when(secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class))
-                .thenReturn(1);
-
-        boolean result = healthRepository.checkSecondaryDatabase();
-
-        assertTrue(result);
-    }
-
-    @Test
-    void checkSecondaryDatabase_WhenDatabaseIsUnhealthy_ReturnsFalse() {
-        when(secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class))
-                .thenThrow(new DataAccessException("Connection failed") {});
-
-        boolean result = healthRepository.checkSecondaryDatabase();
 
         assertFalse(result);
     }

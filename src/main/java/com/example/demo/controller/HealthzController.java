@@ -58,32 +58,20 @@ public class HealthzController {
             return result;
         });
 
-        CompletableFuture<Boolean> secondaryCheck = CompletableFuture.supplyAsync(() -> {
-            boolean result = healthRepository.checkSecondaryDatabase();
-            if (result) {
-                LOGGER.debug("Secondary database connection successful");
-            } else {
-                LOGGER.error("Secondary database connection failed");
-            }
-            return result;
-        });
-
         // Wait for both checks to complete (happens in parallel)
-        CompletableFuture<Void> allChecks = CompletableFuture.allOf(primaryCheck, secondaryCheck);
+        CompletableFuture<Void> allChecks = CompletableFuture.allOf(primaryCheck);
 
         try {
             // Wait max 5 seconds for both checks
             allChecks.get(5, TimeUnit.SECONDS);
 
             boolean primaryHealthy = primaryCheck.get();
-            boolean secondaryHealthy = secondaryCheck.get();
 
-            if (primaryHealthy && secondaryHealthy) {
+            if (primaryHealthy) {
                 return ResponseEntity.ok("OK");
             } else {
-                String message = String.format("Database check failed - Primary: %s, Secondary: %s",
-                    primaryHealthy ? "UP" : "DOWN",
-                    secondaryHealthy ? "UP" : "DOWN");
+                String message = String.format("Database check failed - Primary: %s",
+                    primaryHealthy ? "UP" : "DOWN");
                 return ResponseEntity.status(503).body(message);
             }
         } catch (TimeoutException e) {

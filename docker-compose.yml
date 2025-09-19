@@ -45,9 +45,6 @@ services:
       - SPRING_DATASOURCE_PRIMARY_URL=jdbc:sqlserver://mssql:1433;databaseName=accounts_db;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_PRIMARY_USERNAME=sa
       - SPRING_DATASOURCE_PRIMARY_PASSWORD=YourStrong@Password
-      - SPRING_DATASOURCE_SECONDARY_URL=jdbc:sqlserver://mssql:1433;databaseName=reporting_db;encrypt=true;trustServerCertificate=true
-      - SPRING_DATASOURCE_SECONDARY_USERNAME=sa
-      - SPRING_DATASOURCE_SECONDARY_PASSWORD=YourStrong@Password
       - MANAGEMENT_OTLP_TRACING_ENDPOINT=http://jaeger:4318/v1/traces
     networks:
       - app-network
