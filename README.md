@@ -25,14 +25,26 @@ mvn spring-boot:run
 - **MS SQL Server Integration**: Database connectivity with HikariCP connection pooling
 - **JSON Logging**: All logs are output in JSON format for better parsing and monitoring
 - **Swagger/OpenAPI**: Interactive API documentation available at `/swagger-ui`
+- **Kubernetes Health Probes**: Liveness and readiness endpoints for container orchestration
 
 ## API Endpoints
 
-### Health Check
+### Health Checks
+
+#### Legacy Ping
 ```bash
 curl http://localhost:8080/ping
 ```
-Expected response: `pong`
+
+#### Kubernetes Liveness Probe
+```bash
+curl http://localhost:8080/healthz/live
+```
+
+#### Kubernetes Readiness Probe
+```bash
+curl http://localhost:8080/healthz/ready
+```
 
 ### Get Account by UUID
 ```bash
