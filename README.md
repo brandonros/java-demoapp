@@ -64,6 +64,19 @@ curl http://localhost:8080/api-docs
 1. Update database connection in `application.properties`
 2. Create stored procedure `sp_GetAccountByUuid` in your MS SQL database
 
+## Testing
+
+### Run Tests
+```bash
+./mvnw test
+```
+
+### Generate Coverage Report
+```bash
+./mvnw clean test
+# Coverage report: target/site/jacoco/index.html
+```
+
 ## Building JAR
 
 ```bash
