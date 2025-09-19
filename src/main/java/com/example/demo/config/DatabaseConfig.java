@@ -24,16 +24,12 @@ public class DatabaseConfig {
 
     @Bean
     @Primary
+    @ConfigurationProperties("spring.datasource.primary.hikari")
     public DataSource primaryDataSource() {
-        HikariDataSource dataSource = primaryDataSourceProperties()
+        return primaryDataSourceProperties()
             .initializeDataSourceBuilder()
             .type(HikariDataSource.class)
             .build();
-        // Apply HikariCP specific settings
-        dataSource.setMaximumPoolSize(10);
-        dataSource.setMinimumIdle(2);
-        dataSource.setConnectionTimeout(20000);
-        return dataSource;
     }
 
     @Bean
@@ -50,16 +46,12 @@ public class DatabaseConfig {
     }
 
     @Bean
+    @ConfigurationProperties("spring.datasource.secondary.hikari")
     public DataSource secondaryDataSource() {
-        HikariDataSource dataSource = secondaryDataSourceProperties()
+        return secondaryDataSourceProperties()
             .initializeDataSourceBuilder()
             .type(HikariDataSource.class)
             .build();
-        // Apply HikariCP specific settings
-        dataSource.setMaximumPoolSize(5);
-        dataSource.setMinimumIdle(1);
-        dataSource.setConnectionTimeout(20000);
-        return dataSource;
     }
 
     @Bean
