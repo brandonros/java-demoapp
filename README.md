@@ -4,7 +4,7 @@ A minimal Spring Boot HTTP microservice with MS SQL Server integration, JSON log
 
 ## Prerequisites
 
-- Java 17 or higher
+- Java 24 or higher
 - Maven (optional - project includes Maven wrapper)
 - MS SQL Server (or Azure SQL)
 

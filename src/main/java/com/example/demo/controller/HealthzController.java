@@ -1,14 +1,13 @@
 package com.example.demo.controller;
 
+import com.example.demo.repository.HealthRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,14 +22,10 @@ import java.util.concurrent.TimeoutException;
 public class HealthzController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthzController.class);
-    private final JdbcTemplate primaryJdbcTemplate;
-    private final JdbcTemplate secondaryJdbcTemplate;
+    private final HealthRepository healthRepository;
 
-    public HealthzController(
-            @Qualifier("primaryJdbcTemplate") JdbcTemplate primaryJdbcTemplate,
-            @Qualifier("secondaryJdbcTemplate") JdbcTemplate secondaryJdbcTemplate) {
-        this.primaryJdbcTemplate = primaryJdbcTemplate;
-        this.secondaryJdbcTemplate = secondaryJdbcTemplate;
+    public HealthzController(HealthRepository healthRepository) {
+        this.healthRepository = healthRepository;
     }
 
     @GetMapping("/live")
@@ -54,25 +49,23 @@ public class HealthzController {
 
         // Run both database checks in parallel
         CompletableFuture<Boolean> primaryCheck = CompletableFuture.supplyAsync(() -> {
-            try {
-                primaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+            boolean result = healthRepository.checkPrimaryDatabase();
+            if (result) {
                 logger.debug("Primary database connection successful");
-                return true;
-            } catch (Exception e) {
-                logger.error("Primary database connection failed: {}", e.getMessage());
-                return false;
+            } else {
+                logger.error("Primary database connection failed");
             }
+            return result;
         });
 
         CompletableFuture<Boolean> secondaryCheck = CompletableFuture.supplyAsync(() -> {
-            try {
-                secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+            boolean result = healthRepository.checkSecondaryDatabase();
+            if (result) {
                 logger.debug("Secondary database connection successful");
-                return true;
-            } catch (Exception e) {
-                logger.error("Secondary database connection failed: {}", e.getMessage());
-                return false;
+            } else {
+                logger.error("Secondary database connection failed");
             }
+            return result;
         });
 
         // Wait for both checks to complete (happens in parallel)
