@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Health", description = "Health check endpoints")
+@Tag(name = "Utility", description = "Utility and diagnostic endpoints")
 public class PingController {
 
     private static final Logger logger = LoggerFactory.getLogger(PingController.class);

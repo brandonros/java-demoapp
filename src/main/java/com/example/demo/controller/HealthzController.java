@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/healthz")
 @Tag(name = "Health", description = "Kubernetes health check endpoints")
-public class HealthController {
+public class HealthzController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HealthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(HealthzController.class);
     private final JdbcTemplate jdbcTemplate;
 
-    public HealthController(JdbcTemplate jdbcTemplate) {
+    public HealthzController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
