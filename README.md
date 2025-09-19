@@ -1,6 +1,6 @@
 # Spring Boot Microservice
 
-A minimal Spring Boot HTTP microservice with a simple ping endpoint.
+A minimal Spring Boot HTTP microservice with a simple ping endpoint, JSON logging, and Swagger documentation.
 
 ## Prerequisites
 
@@ -19,15 +19,26 @@ A minimal Spring Boot HTTP microservice with a simple ping endpoint.
 mvn spring-boot:run
 ```
 
-## Testing the Endpoint
+## Features
 
-Once the application is running on port 8080:
+- **JSON Logging**: All logs are output in JSON format for better parsing and monitoring
+- **Swagger/OpenAPI**: Interactive API documentation available at `/swagger-ui`
 
+## API Endpoints
+
+### Health Check
 ```bash
 curl http://localhost:8080/ping
 ```
-
 Expected response: `pong`
+
+### Swagger UI
+Open in browser: http://localhost:8080/swagger-ui
+
+### OpenAPI Documentation
+```bash
+curl http://localhost:8080/api-docs
+```
 
 ## Building JAR
 
