@@ -1,4 +1,4 @@
-# Spring Boot Microservice
+# java-demoapp
 
 A minimal Spring Boot HTTP microservice with MS SQL Server integration, JSON logging, and Swagger documentation.
 
