@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demoapp.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

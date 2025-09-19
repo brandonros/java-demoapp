@@ -6,11 +6,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>demoapp</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>demo</name>
+    <name>demoapp</name>
     <description>Minimal Spring Boot microservice</description>
 
     <parent>

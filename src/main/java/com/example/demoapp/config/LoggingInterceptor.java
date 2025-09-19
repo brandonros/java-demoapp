@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demoapp.config;
 
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.http.HttpServletRequest;

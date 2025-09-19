@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demoapp.config;
 
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.aop.ObservedAspect;

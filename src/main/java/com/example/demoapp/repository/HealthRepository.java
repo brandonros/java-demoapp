@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demoapp.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;

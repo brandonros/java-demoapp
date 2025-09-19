@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.example.demoapp.repository.HealthRepository;
+
 import org.springframework.dao.DataAccessException;
 
 import static org.junit.jupiter.api.Assertions.*;

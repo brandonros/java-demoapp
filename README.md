@@ -91,5 +91,5 @@ curl http://localhost:8080/api-docs
 
 Run the JAR:
 ```bash
-java -jar target/demo-1.0.0.jar
+java -jar target/demoapp-1.0.0.jar
 ```
