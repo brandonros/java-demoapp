@@ -20,6 +20,17 @@ services:
     networks:
       - app-network
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4318:4318"    # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - app-network
+
   app:
     build: .
     container_name: spring-app
@@ -28,6 +39,8 @@ services:
     depends_on:
       mssql:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     environment:
       - SPRING_DATASOURCE_PRIMARY_URL=jdbc:sqlserver://mssql:1433;databaseName=accounts_db;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_PRIMARY_USERNAME=sa
@@ -35,6 +48,7 @@ services:
       - SPRING_DATASOURCE_SECONDARY_URL=jdbc:sqlserver://mssql:1433;databaseName=reporting_db;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_SECONDARY_USERNAME=sa
       - SPRING_DATASOURCE_SECONDARY_PASSWORD=YourStrong@Password
+      - MANAGEMENT_OTLP_TRACING_ENDPOINT=http://jaeger:4318/v1/traces
     networks:
       - app-network
 

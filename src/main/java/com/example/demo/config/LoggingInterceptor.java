@@ -40,11 +40,16 @@ public class LoggingInterceptor implements HandlerInterceptor {
         // Add to response header
         response.setHeader(CORRELATION_ID_HEADER, correlationId);
 
-        // Add OpenTelemetry trace ID to response
+        // Add OpenTelemetry trace ID to response and tag span with correlation ID
         var span = tracer.currentSpan();
         if (span != null) {
             String traceId = span.context().traceId();
             response.setHeader(TRACE_ID_HEADER, traceId);
+
+            // Add correlation ID as a span tag for Jaeger search
+            span.tag("correlation.id", correlationId);
+            span.tag("http.request.method", request.getMethod());
+            span.tag("http.request.uri", request.getRequestURI());
         }
 
         // Store start time for duration calculation
