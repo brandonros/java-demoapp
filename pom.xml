@@ -178,7 +178,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
+                    <configLocation>google_checks.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
