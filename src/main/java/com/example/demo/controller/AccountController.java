@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.repository.AccountRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -7,13 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -49,36 +46,5 @@ public class AccountController {
                 logger.warn("Account not found: {}", uuid);
                 return ResponseEntity.notFound().build();
             });
-    }
-}
-
-@org.springframework.stereotype.Repository
-class AccountRepository {
-
-    private static final Logger logger = LoggerFactory.getLogger(AccountRepository.class);
-    private final JdbcTemplate jdbc;
-
-    AccountRepository(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
-
-    Optional<Map<String, Object>> findByUuid(UUID uuid) {
-        try {
-            logger.debug("Executing stored procedure sp_GetAccountByUuid for UUID: {}", uuid);
-
-            // Call stored procedure - using EXEC for MS SQL
-            Map<String, Object> result = jdbc.queryForMap(
-                "EXEC sp_GetAccountByUuid ?",
-                uuid.toString()
-            );
-
-            return Optional.of(result);
-        } catch (EmptyResultDataAccessException e) {
-            logger.debug("No account found for UUID: {}", uuid);
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Error fetching account for UUID: {}", uuid, e);
-            throw e;
-        }
     }
 }

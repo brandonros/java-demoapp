@@ -36,9 +36,8 @@ Expected response: `pong`
 
 ### Get Account by UUID
 ```bash
-curl http://localhost:8080/api/accounts/550e8400-e29b-41d4-a716-446655440000
+curl http://localhost:8080/api/accounts/{uuid}
 ```
-Calls stored procedure `sp_GetAccountByUuid` and returns account data
 
 ### Swagger UI
 Open in browser: http://localhost:8080/swagger-ui
@@ -48,26 +47,10 @@ Open in browser: http://localhost:8080/swagger-ui
 curl http://localhost:8080/api-docs
 ```
 
-## Database Configuration
+## Database Setup
 
-Update `src/main/resources/application.properties` with your database connection:
-```properties
-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=mydb
-spring.datasource.username=sa
-spring.datasource.password=YourPassword
-```
-
-### Required Stored Procedure
-
-Create this stored procedure in your MS SQL database:
-```sql
-CREATE PROCEDURE sp_GetAccountByUuid
-    @uuid NVARCHAR(36)
-AS
-BEGIN
-    SELECT * FROM Accounts WHERE account_uuid = @uuid
-END
-```
+1. Update database connection in `application.properties`
+2. Create stored procedure `sp_GetAccountByUuid` in your MS SQL database
 
 ## Building JAR
 
