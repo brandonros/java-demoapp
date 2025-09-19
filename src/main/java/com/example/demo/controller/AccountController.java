@@ -9,7 +9,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -18,7 +21,7 @@ import java.util.UUID;
 @Tag(name = "Accounts", description = "Account management endpoints")
 public class AccountController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountController.class);
     private final AccountRepository repository;
 
     public AccountController(AccountRepository repository) {
@@ -35,15 +38,15 @@ public class AccountController {
             @Parameter(description = "Account UUID", required = true)
             @PathVariable UUID uuid) {
 
-        logger.info("Fetching account with UUID: {}", uuid);
+        LOGGER.info("Fetching account with UUID: {}", uuid);
 
         return repository.findByUuid(uuid)
             .map(account -> {
-                logger.info("Account found: {}", uuid);
+                LOGGER.info("Account found: {}", uuid);
                 return ResponseEntity.ok(account);
             })
             .orElseGet(() -> {
-                logger.warn("Account not found: {}", uuid);
+                LOGGER.warn("Account not found: {}", uuid);
                 return ResponseEntity.notFound().build();
             });
     }

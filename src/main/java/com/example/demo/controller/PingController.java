@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Utility", description = "Utility and diagnostic endpoints")
 public class PingController {
 
-    private static final Logger logger = LoggerFactory.getLogger(PingController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingController.class);
 
     @GetMapping("/ping")
     @Operation(summary = "Ping endpoint", description = "Returns pong to verify the service is running")
@@ -22,7 +22,7 @@ public class PingController {
         @ApiResponse(responseCode = "200", description = "Successful response")
     })
     public ResponseEntity<String> ping() {
-        logger.info("Ping endpoint called");
+        LOGGER.info("Ping endpoint called");
         return ResponseEntity.ok("pong");
     }
 }

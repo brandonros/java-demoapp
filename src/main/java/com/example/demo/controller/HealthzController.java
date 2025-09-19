@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 @Tag(name = "Health", description = "Kubernetes health check endpoints")
 public class HealthzController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HealthzController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HealthzController.class);
     private final HealthRepository healthRepository;
 
     public HealthzController(HealthRepository healthRepository) {
@@ -34,7 +34,7 @@ public class HealthzController {
         @ApiResponse(responseCode = "200", description = "Application is alive")
     })
     public ResponseEntity<String> live() {
-        logger.debug("Liveness probe called");
+        LOGGER.debug("Liveness probe called");
         return ResponseEntity.ok("OK");
     }
 
@@ -45,15 +45,15 @@ public class HealthzController {
         @ApiResponse(responseCode = "503", description = "Application is not ready")
     })
     public ResponseEntity<String> ready() {
-        logger.debug("Readiness probe called");
+        LOGGER.debug("Readiness probe called");
 
         // Run both database checks in parallel
         CompletableFuture<Boolean> primaryCheck = CompletableFuture.supplyAsync(() -> {
             boolean result = healthRepository.checkPrimaryDatabase();
             if (result) {
-                logger.debug("Primary database connection successful");
+                LOGGER.debug("Primary database connection successful");
             } else {
-                logger.error("Primary database connection failed");
+                LOGGER.error("Primary database connection failed");
             }
             return result;
         });
@@ -61,9 +61,9 @@ public class HealthzController {
         CompletableFuture<Boolean> secondaryCheck = CompletableFuture.supplyAsync(() -> {
             boolean result = healthRepository.checkSecondaryDatabase();
             if (result) {
-                logger.debug("Secondary database connection successful");
+                LOGGER.debug("Secondary database connection successful");
             } else {
-                logger.error("Secondary database connection failed");
+                LOGGER.error("Secondary database connection failed");
             }
             return result;
         });
@@ -87,10 +87,10 @@ public class HealthzController {
                 return ResponseEntity.status(503).body(message);
             }
         } catch (TimeoutException e) {
-            logger.error("Health check timed out");
+            LOGGER.error("Health check timed out");
             return ResponseEntity.status(503).body("Health check timed out");
         } catch (Exception e) {
-            logger.error("Health check failed", e);
+            LOGGER.error("Health check failed", e);
             return ResponseEntity.status(503).body("Health check failed");
         }
     }

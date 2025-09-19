@@ -14,7 +14,7 @@ import java.util.UUID;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingInterceptor.class);
     private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
     private static final String TRACE_ID_HEADER = "X-Trace-Id";
     private static final String CORRELATION_ID_MDC_KEY = "correlationId";
@@ -56,7 +56,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         request.setAttribute(START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
         // Log incoming request
-        logger.info("Incoming request: {} {} from {}",
+        LOGGER.info("Incoming request: {} {} from {}",
             request.getMethod(),
             request.getRequestURI(),
             request.getRemoteAddr());
@@ -65,21 +65,22 @@ public class LoggingInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) {
         // Calculate request duration
         long startTime = (Long) request.getAttribute(START_TIME_ATTRIBUTE);
         long duration = System.currentTimeMillis() - startTime;
 
         // Log response
         if (ex != null) {
-            logger.error("Request completed with error: {} {} - Status: {} - Duration: {}ms - Error: {}",
+            LOGGER.error("Request completed with error: {} {} - Status: {} - Duration: {}ms - Error: {}",
                 request.getMethod(),
                 request.getRequestURI(),
                 response.getStatus(),
                 duration,
                 ex.getMessage());
         } else {
-            logger.info("Request completed: {} {} - Status: {} - Duration: {}ms",
+            LOGGER.info("Request completed: {} {} - Status: {} - Duration: {}ms",
                 request.getMethod(),
                 request.getRequestURI(),
                 response.getStatus(),

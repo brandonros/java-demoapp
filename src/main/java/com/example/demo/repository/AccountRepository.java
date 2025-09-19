@@ -14,7 +14,7 @@ import java.util.UUID;
 @Repository
 public class AccountRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountRepository.class);
     private final JdbcTemplate jdbc;
 
     public AccountRepository(@Qualifier("primaryJdbcTemplate") JdbcTemplate jdbc) {
@@ -23,7 +23,7 @@ public class AccountRepository {
 
     public Optional<Map<String, Object>> findByUuid(UUID uuid) {
         try {
-            logger.debug("Executing stored procedure sp_GetAccountByUuid for UUID: {}", uuid);
+            LOGGER.debug("Executing stored procedure sp_GetAccountByUuid for UUID: {}", uuid);
 
             // Call stored procedure - using EXEC for MS SQL
             Map<String, Object> result = jdbc.queryForMap(
@@ -33,10 +33,10 @@ public class AccountRepository {
 
             return Optional.of(result);
         } catch (EmptyResultDataAccessException e) {
-            logger.debug("No account found for UUID: {}", uuid);
+            LOGGER.debug("No account found for UUID: {}", uuid);
             return Optional.empty();
         } catch (Exception e) {
-            logger.error("Error fetching account for UUID: {}", uuid, e);
+            LOGGER.error("Error fetching account for UUID: {}", uuid, e);
             throw e;
         }
     }
