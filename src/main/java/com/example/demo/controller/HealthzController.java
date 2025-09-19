@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthzController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthzController.class);
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate primaryJdbcTemplate;
+    private final JdbcTemplate secondaryJdbcTemplate;
 
-    public HealthzController(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public HealthzController(
+            @Qualifier("primaryJdbcTemplate") JdbcTemplate primaryJdbcTemplate,
+            @Qualifier("secondaryJdbcTemplate") JdbcTemplate secondaryJdbcTemplate) {
+        this.primaryJdbcTemplate = primaryJdbcTemplate;
+        this.secondaryJdbcTemplate = secondaryJdbcTemplate;
     }
 
     @GetMapping("/live")
@@ -43,14 +48,35 @@ public class HealthzController {
     public ResponseEntity<String> ready() {
         logger.debug("Readiness probe called");
 
+        boolean primaryHealthy = false;
+        boolean secondaryHealthy = false;
+
+        // Check primary database
         try {
-            // Simple database connectivity check
-            jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            logger.debug("Database connection successful");
-            return ResponseEntity.ok("OK");
+            primaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+            logger.debug("Primary database connection successful");
+            primaryHealthy = true;
         } catch (Exception e) {
-            logger.error("Database connection failed: {}", e.getMessage());
-            return ResponseEntity.status(503).body("Database connection failed");
+            logger.error("Primary database connection failed: {}", e.getMessage());
+        }
+
+        // Check secondary database
+        try {
+            secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+            logger.debug("Secondary database connection successful");
+            secondaryHealthy = true;
+        } catch (Exception e) {
+            logger.error("Secondary database connection failed: {}", e.getMessage());
+        }
+
+        // Both databases must be healthy for service to be ready
+        if (primaryHealthy && secondaryHealthy) {
+            return ResponseEntity.ok("OK");
+        } else {
+            String message = String.format("Database check failed - Primary: %s, Secondary: %s",
+                primaryHealthy ? "UP" : "DOWN",
+                secondaryHealthy ? "UP" : "DOWN");
+            return ResponseEntity.status(503).body(message);
         }
     }
 }

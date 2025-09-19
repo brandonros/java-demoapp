@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ public class AccountRepository {
     private static final Logger logger = LoggerFactory.getLogger(AccountRepository.class);
     private final JdbcTemplate jdbc;
 
-    public AccountRepository(JdbcTemplate jdbc) {
+    public AccountRepository(@Qualifier("primaryJdbcTemplate") JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
