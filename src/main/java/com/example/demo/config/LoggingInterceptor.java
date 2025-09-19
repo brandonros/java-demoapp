@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import io.micrometer.tracing.Tracer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -15,8 +16,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
     private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
+    private static final String TRACE_ID_HEADER = "X-Trace-Id";
     private static final String CORRELATION_ID_MDC_KEY = "correlationId";
     private static final String START_TIME_ATTRIBUTE = "startTime";
+
+    private final Tracer tracer;
+
+    public LoggingInterceptor(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -31,6 +39,13 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
         // Add to response header
         response.setHeader(CORRELATION_ID_HEADER, correlationId);
+
+        // Add OpenTelemetry trace ID to response
+        var span = tracer.currentSpan();
+        if (span != null) {
+            String traceId = span.context().traceId();
+            response.setHeader(TRACE_ID_HEADER, traceId);
+        }
 
         // Store start time for duration calculation
         request.setAttribute(START_TIME_ATTRIBUTE, System.currentTimeMillis());
