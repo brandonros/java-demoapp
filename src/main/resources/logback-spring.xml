@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- Define properties from environment variables with defaults -->
+    <property name="SERVICE_NAME" value="${SERVICE_NAME:-demoapp}"/>
+    <property name="ENVIRONMENT" value="${ENVIRONMENT:-development}"/>
+    <property name="HOSTNAME" value="${HOSTNAME:-unknown}"/>
+    <property name="APP_VERSION" value="${APP_VERSION:-unknown}"/>
+
     <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeContext>false</includeContext>
@@ -14,6 +20,16 @@
             </fieldNames>
             <!-- Include MDC fields (like correlationId) in JSON output -->
             <includeMdc>true</includeMdc>
+
+            <!-- Add custom fields with service name and environment variables -->
+            <customFields>
+                {
+                    "service":"${SERVICE_NAME}",
+                    "environment":"${ENVIRONMENT}",
+                    "hostname":"${HOSTNAME}",
+                    "version":"${APP_VERSION}"
+                }
+            </customFields>
         </encoder>
     </appender>
 
