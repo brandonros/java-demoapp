@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @RestController
 @RequestMapping("/healthz")
 @Tag(name = "Health", description = "Kubernetes health check endpoints")
@@ -48,35 +52,53 @@ public class HealthzController {
     public ResponseEntity<String> ready() {
         logger.debug("Readiness probe called");
 
-        boolean primaryHealthy = false;
-        boolean secondaryHealthy = false;
+        // Run both database checks in parallel
+        CompletableFuture<Boolean> primaryCheck = CompletableFuture.supplyAsync(() -> {
+            try {
+                primaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+                logger.debug("Primary database connection successful");
+                return true;
+            } catch (Exception e) {
+                logger.error("Primary database connection failed: {}", e.getMessage());
+                return false;
+            }
+        });
 
-        // Check primary database
+        CompletableFuture<Boolean> secondaryCheck = CompletableFuture.supplyAsync(() -> {
+            try {
+                secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
+                logger.debug("Secondary database connection successful");
+                return true;
+            } catch (Exception e) {
+                logger.error("Secondary database connection failed: {}", e.getMessage());
+                return false;
+            }
+        });
+
+        // Wait for both checks to complete (happens in parallel)
+        CompletableFuture<Void> allChecks = CompletableFuture.allOf(primaryCheck, secondaryCheck);
+
         try {
-            primaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            logger.debug("Primary database connection successful");
-            primaryHealthy = true;
-        } catch (Exception e) {
-            logger.error("Primary database connection failed: {}", e.getMessage());
-        }
+            // Wait max 5 seconds for both checks
+            allChecks.get(5, TimeUnit.SECONDS);
 
-        // Check secondary database
-        try {
-            secondaryJdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            logger.debug("Secondary database connection successful");
-            secondaryHealthy = true;
-        } catch (Exception e) {
-            logger.error("Secondary database connection failed: {}", e.getMessage());
-        }
+            boolean primaryHealthy = primaryCheck.get();
+            boolean secondaryHealthy = secondaryCheck.get();
 
-        // Both databases must be healthy for service to be ready
-        if (primaryHealthy && secondaryHealthy) {
-            return ResponseEntity.ok("OK");
-        } else {
-            String message = String.format("Database check failed - Primary: %s, Secondary: %s",
-                primaryHealthy ? "UP" : "DOWN",
-                secondaryHealthy ? "UP" : "DOWN");
-            return ResponseEntity.status(503).body(message);
+            if (primaryHealthy && secondaryHealthy) {
+                return ResponseEntity.ok("OK");
+            } else {
+                String message = String.format("Database check failed - Primary: %s, Secondary: %s",
+                    primaryHealthy ? "UP" : "DOWN",
+                    secondaryHealthy ? "UP" : "DOWN");
+                return ResponseEntity.status(503).body(message);
+            }
+        } catch (TimeoutException e) {
+            logger.error("Health check timed out");
+            return ResponseEntity.status(503).body("Health check timed out");
+        } catch (Exception e) {
+            logger.error("Health check failed", e);
+            return ResponseEntity.status(503).body("Health check failed");
         }
     }
 }
