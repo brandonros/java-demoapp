@@ -77,6 +77,12 @@ curl http://localhost:8080/api-docs
 # Coverage report: target/site/jacoco/index.html
 ```
 
+### Verify Coverage Thresholds
+```bash
+./mvnw clean verify
+# Enforces minimum 80% code coverage
+```
+
 ## Building JAR
 
 ```bash
