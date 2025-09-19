@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-dev
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Password
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Password", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  app:
+    build: .
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_PRIMARY_URL=jdbc:sqlserver://mssql:1433;databaseName=accounts_db;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_PRIMARY_USERNAME=sa
+      - SPRING_DATASOURCE_PRIMARY_PASSWORD=YourStrong@Password
+      - SPRING_DATASOURCE_SECONDARY_URL=jdbc:sqlserver://mssql:1433;databaseName=reporting_db;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_SECONDARY_USERNAME=sa
+      - SPRING_DATASOURCE_SECONDARY_PASSWORD=YourStrong@Password
+    networks:
+      - app-network
+
+volumes:
+  mssql-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -12,6 +12,8 @@
                 <thread>thread</thread>
                 <level>level</level>
             </fieldNames>
+            <!-- Include MDC fields (like correlationId) in JSON output -->
+            <includeMdc>true</includeMdc>
         </encoder>
     </appender>
 
