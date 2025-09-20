@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoapp.repository.HealthRepository;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 @RestController
 @RequestMapping("/healthz")
 @Tag(name = "Health", description = "Kubernetes health check endpoints")
@@ -47,40 +43,18 @@ public class HealthzController {
     })
     public ResponseEntity<String> ready() {
         LOGGER.debug("Readiness probe called");
-
-        // Run both database checks in parallel
-        CompletableFuture<Boolean> primaryCheck = CompletableFuture.supplyAsync(() -> {
-            boolean result = healthRepository.checkPrimaryDatabase();
-            if (result) {
-                LOGGER.debug("Primary database connection successful");
-            } else {
-                LOGGER.error("Primary database connection failed");
-            }
-            return result;
-        });
-
-        // Wait for both checks to complete (happens in parallel)
-        CompletableFuture<Void> allChecks = CompletableFuture.allOf(primaryCheck);
-
+        
         try {
-            // Wait max 5 seconds for both checks
-            allChecks.get(5, TimeUnit.SECONDS);
-
-            boolean primaryHealthy = primaryCheck.get();
-
-            if (primaryHealthy) {
+            if (healthRepository.checkPrimaryDatabase()) {
+                LOGGER.debug("Primary database connection successful");
                 return ResponseEntity.ok("OK");
             } else {
-                String message = String.format("Database check failed - Primary: %s",
-                    primaryHealthy ? "UP" : "DOWN");
-                return ResponseEntity.status(503).body(message);
+                LOGGER.error("Primary database connection failed");
+                return ResponseEntity.status(503).body("Database check failed");
             }
-        } catch (TimeoutException e) {
-            LOGGER.error("Health check timed out");
-            return ResponseEntity.status(503).body("Health check timed out");
         } catch (Exception e) {
             LOGGER.error("Health check failed", e);
-            return ResponseEntity.status(503).body("Health check failed");
+            return ResponseEntity.status(503).body("Health check failed: " + e.getMessage());
         }
     }
 }
