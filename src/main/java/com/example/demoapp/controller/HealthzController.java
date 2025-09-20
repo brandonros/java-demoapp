@@ -50,7 +50,7 @@ public class HealthzController {
                 return ResponseEntity.ok("OK");
             } else {
                 LOGGER.error("Primary database connection failed");
-                return ResponseEntity.status(503).body("Database check failed");
+                return ResponseEntity.status(503).body("Database check failed - Primary: DOWN");
             }
         } catch (Exception e) {
             LOGGER.error("Health check failed", e);

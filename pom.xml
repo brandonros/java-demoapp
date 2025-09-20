@@ -62,6 +62,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- DataSource Proxy for query-level metrics -->
+        <dependency>
+            <groupId>net.ttddyy</groupId>
+            <artifactId>datasource-proxy</artifactId>
+            <version>1.10</version>
+        </dependency>
+
         <!-- Actuator for metrics and health -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
